@@ -47,6 +47,11 @@ class TicketDetailFragment : Fragment() {
             ticketTitle.doOnTextChanged { text, _, _, _ ->
                 ticket = ticket.copy(title = text.toString())
             }
+            ticketDate.apply {
+                text = ticket.date.toString()
+                isEnabled = false
+            }
+
             ticketSolved.setOnCheckedChangeListener { _, isChecked ->
                 ticket = ticket.copy(isSolved = isChecked)
             }
