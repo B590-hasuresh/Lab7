@@ -11,7 +11,7 @@ import com.example.myapplication.databinding.FragmentTicketDetailBinding
 import java.util.Date
 import java.util.UUID
 
-class TicketDetailFragment : Fragment() {
+class TicketDetailFragment :Fragment(R.layout.fragment_ticket_detail) {
     private var _binding: FragmentTicketDetailBinding? = null
     private val binding
         get() = checkNotNull(_binding) {
@@ -46,6 +46,10 @@ class TicketDetailFragment : Fragment() {
         binding.apply {
             ticketTitle.doOnTextChanged { text, _, _, _ ->
                 ticket = ticket.copy(title = text.toString())
+            }
+            ticketDate.apply {
+                text = ticket.date.toString()
+                isEnabled = false
             }
             ticketSolved.setOnCheckedChangeListener { _, isChecked ->
                 ticket = ticket.copy(isSolved = isChecked)
