@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.lab7
 
 import androidx.fragment.app.Fragment
 
@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
-import com.example.myapplication.databinding.FragmentTicketDetailBinding
+import com.example.lab7.databinding.FragmentTicketDetailBinding
 import java.util.Date
 import java.util.UUID
 

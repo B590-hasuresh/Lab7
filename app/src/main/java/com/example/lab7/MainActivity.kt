@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.lab7
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, TicketDetailFragment())
+            .replace(R.id.fragment_container, TicketListFragment())
             .commit()
     }
 }
