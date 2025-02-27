@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
+import kotlinx.coroutines.flow.update
 
 class TicketDetailViewModel(ticketId: UUID) : ViewModel() {
     private val ticketRepository = TicketRepository.get()
@@ -25,6 +26,21 @@ class TicketDetailViewModel(ticketId: UUID) : ViewModel() {
             }
         }
 
+    }
+
+    fun updateTicket(onUpdate: (Ticket) -> Ticket) {
+        _ticket.update { oldTicket ->
+            oldTicket?.let { onUpdate(it) }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        _ticket.value?.let{ ticketRepository.updateTicket(it)}
+
+        viewModelScope.launch {
+            _ticket.value?.let { ticketRepository.updateTicket(it) }
+        }
     }
 }
 

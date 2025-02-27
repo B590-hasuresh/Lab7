@@ -56,22 +56,29 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-/*            ticketTitle.doOnTextChanged { text, _, _, _ ->
-                ticket = ticket.copy(title = text.toString())
-            }
-            ticketSolved.setOnCheckedChangeListener { _, isChecked ->
-                ticket = ticket.copy(isSolved = isChecked)
-            }*/
-            ticketDate.apply {
-                //    text = ticket.date.toString()
-                isEnabled = false
+            binding.apply {
+                ticketTitle.doOnTextChanged { text, _, _, _ ->
+                    ticketDetailViewModel.updateTicket { oldTicket ->
+                        oldTicket.copy(title = text.toString())
+                    }
+                }
+
+                ticketDate.apply {
+                    isEnabled = false
+                }
+
+                ticketSolved.setOnCheckedChangeListener { _, isChecked ->
+                    ticketDetailViewModel.updateTicket { oldTicket ->
+                        oldTicket.copy(isSolved = isChecked)
+                    }
+                }
             }
 
         }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                ticketDetailViewModel.ticket.collect { ticket ->
-                    ticket?.let { updateUi(it) }
+                ticketDetailViewModel.ticket.collect {
+                        ticket -> ticket?.let { updateUi(it) }
                 }
             }
         }
