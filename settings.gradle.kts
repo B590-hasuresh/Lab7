@@ -10,6 +10,12 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+    plugins {
+        id("androidx.navigation.safeargs.kotlin") version "2.8.2"
+        id("com.android.application") version "8.1.2" apply false
+        id("org.jetbrains.kotlin.android") version "1.8.0" apply false
+        id("org.jetbrains.kotlin.kapt") version "1.8.0" apply false
+    }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -19,6 +25,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "My Application"
+rootProject.name = "lab7"
 include(":app")
- 

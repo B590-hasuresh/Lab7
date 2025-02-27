@@ -13,5 +13,5 @@ interface TicketDao {
     fun getTickets(): Flow<List<Ticket>>
 
     @Query("SELECT * FROM ticket WHERE id=:id")
-    fun getTicket(id: UUID): Ticket
+    fun getTicket(id: UUID): Flow<Ticket>
 }

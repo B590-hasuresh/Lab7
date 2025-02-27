@@ -7,7 +7,7 @@ import java.util.UUID
 
 @Entity
 data class Ticket(
-    @PrimaryKey val id: String = java.util.UUID.randomUUID().toString(),
+    @PrimaryKey val id: UUID = java.util.UUID.randomUUID(),
     val title: String,
     val date: Long,
     val isSolved: Boolean

@@ -2,6 +2,7 @@ package com.example.lab7.database
 
 import androidx.room.TypeConverter
 import java.util.Date
+import java.util.UUID
 
 class TicketTypeConverter {
 
@@ -14,4 +15,14 @@ class TicketTypeConverter {
     fun toDate(millisSinceEpoch: Long): Date {
         return Date(millisSinceEpoch)
     }
+    @TypeConverter
+    fun fromUUID(id: UUID): String {
+        return id.toString()
+    }
+
+    @TypeConverter
+    fun toUUID(idString: String): UUID {
+        return UUID.fromString(idString)
+    }
+
 }

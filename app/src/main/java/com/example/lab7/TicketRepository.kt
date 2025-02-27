@@ -17,7 +17,7 @@ class TicketRepository private constructor(context: Context) {
         .build()
 
     fun getTickets(): Flow<List<Ticket>> = database.ticketDao().getTickets()
-    fun getTicket(id: UUID): Ticket = database.ticketDao().getTicket(id)
+    fun getTicket(id: UUID): Flow<Ticket> = database.ticketDao().getTicket(id)
 
     companion object {
         private var INSTANCE: TicketRepository? = null
