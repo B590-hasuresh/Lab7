@@ -1,22 +1,26 @@
 package com.example.lab7
 
 import androidx.lifecycle.ViewModel
-import java.util.Date
-import java.util.UUID
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+private const val TAG = "TicketListViewModel"
 
 class TicketListViewModel : ViewModel() {
 
-    val tickets = mutableListOf<Ticket>()
+    private val ticketRepository = TicketRepository.get()
+
+    private val _tickets: MutableStateFlow<List<Ticket>> = MutableStateFlow(emptyList())
+    val tickets: StateFlow<List<Ticket>>
+        get() = _tickets.asStateFlow()
 
     init {
-        for (i in 0 until 100) {
-            val ticket = Ticket(
-                id = UUID.randomUUID(),
-                title = "ticket #$i",
-                date = Date(),
-                isSolved = i % 2 == 0
-            )
-            tickets += ticket
+        viewModelScope.launch {
+            ticketRepository.getTickets().collect {
+                _tickets.value = it
+            }
         }
     }
 }
