@@ -1,6 +1,7 @@
 package com.example.lab7.database
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import com.example.lab7.Ticket
 import kotlinx.coroutines.flow.Flow
@@ -18,4 +19,7 @@ interface TicketDao {
 
     @Update
     fun updateTicket(ticket: Ticket)
+
+    @Insert
+    fun addTicket(ticket: Ticket)
 }
