@@ -11,7 +11,7 @@ import com.example.lab7.databinding.FragmentTicketDetailBinding
 import java.util.Date
 import java.util.UUID
 
-class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
+class TicketDetailFragment : Fragment() {
     private var _binding: FragmentTicketDetailBinding? = null
     private val binding
         get() = checkNotNull(_binding) {
@@ -28,7 +28,8 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             id = UUID.randomUUID(),
             title = "",
             date = Date(),
-            isSolved = false
+            isSolved = false,
+            requiresManager = false
         )
     }
     override fun onCreateView(
@@ -47,13 +48,12 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             ticketTitle.doOnTextChanged { text, _, _, _ ->
                 ticket = ticket.copy(title = text.toString())
             }
+            ticketSolved.setOnCheckedChangeListener { _, isChecked ->
+                ticket = ticket.copy(isSolved = isChecked)
+            }
             ticketDate.apply {
                 text = ticket.date.toString()
                 isEnabled = false
-            }
-
-            ticketSolved.setOnCheckedChangeListener { _, isChecked ->
-                ticket = ticket.copy(isSolved = isChecked)
             }
 
         }
