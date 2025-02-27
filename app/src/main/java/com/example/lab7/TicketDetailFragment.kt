@@ -7,10 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.example.lab7.databinding.FragmentTicketDetailBinding
 import java.util.Date
 import java.util.UUID
@@ -30,18 +32,7 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             "Cannot access the view because it is null."
         }
 
-    private lateinit var ticket: Ticket
 
-    /*override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        ticket = Ticket(
-            id = UUID.randomUUID(),
-            title = "",
-            date = Date().time,
-            isSolved = false
-        )
-    }*/
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,11 +53,6 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
                         oldTicket.copy(title = text.toString())
                     }
                 }
-
-                ticketDate.apply {
-                    isEnabled = false
-                }
-
                 ticketSolved.setOnCheckedChangeListener { _, isChecked ->
                     ticketDetailViewModel.updateTicket { oldTicket ->
                         oldTicket.copy(isSolved = isChecked)
@@ -77,11 +63,20 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
         }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                ticketDetailViewModel.ticket.collect {
-                        ticket -> ticket?.let { updateUi(it) }
+                ticketDetailViewModel.ticket.collect { ticket ->
+                    ticket?.let { updateUi(it) }
                 }
             }
         }
+        setFragmentResultListener(
+            DatePickerFragment.REQUEST_KEY_DATE
+        ) { _, bundle ->
+            val newDate = bundle.getSerializable(DatePickerFragment.BUNDLE_KEY_DATE) as Date
+            ticketDetailViewModel.updateTicket { oldTicket ->
+                oldTicket.copy(date = newDate.time)
+            }
+        }
+
 
 
     }
@@ -98,6 +93,11 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             }
 
             ticketDate.text = dateFormat.format(Date(ticket.date))
+            ticketDate.setOnClickListener{
+                val currentDate = Date(ticket.date)
+
+                findNavController().navigate((TicketDetailFragmentDirections.selectDate(currentDate)))
+            }
             ticketSolved.isChecked = ticket.isSolved
         }
     }
