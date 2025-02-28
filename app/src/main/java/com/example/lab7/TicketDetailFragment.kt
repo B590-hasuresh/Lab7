@@ -1,6 +1,5 @@
 package com.example.lab7
 
-
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -30,10 +29,10 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.UUID
 
 private const val TAG = "TicketDetailFragment"
 private const val DATE_FORMAT = "EEE, MMM, dd"
+
 class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
     private var photoName: String? = null
     private val args: TicketDetailFragmentArgs by navArgs()
@@ -49,7 +48,7 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
     private val selectAssignee = registerForActivityResult(
         ActivityResultContracts.PickContact()
     ) { uri: Uri? ->
-        uri?.let { parseContactSelection(it)}
+        uri?.let { parseContactSelection(it) }
     }
 
     private val takePhoto = registerForActivityResult(
@@ -75,57 +74,50 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-            binding.apply {
-                ticketTitle.doOnTextChanged { text, _, _, _ ->
-                    ticketDetailViewModel.updateTicket { oldTicket ->
-                        oldTicket.copy(title = text.toString())
-                    }
+            ticketTitle.doOnTextChanged { text, _, _, _ ->
+                ticketDetailViewModel.updateTicket { oldTicket ->
+                    oldTicket.copy(title = text.toString())
                 }
-
-                ticketSolved.setOnCheckedChangeListener { _, isChecked ->
-                    ticketDetailViewModel.updateTicket { oldTicket ->
-                        oldTicket.copy(isSolved = isChecked)
-                    }
-                }
-
-                ticketAssignee.setOnClickListener{
-                    selectAssignee.launch(null)
-                }
-
-                val selectAssigneeIntent = selectAssignee.contract.createIntent(
-                    requireContext(),
-                    input = null
-                )
-
-                ticketAssignee.isEnabled = canResolveIntent(selectAssigneeIntent)
-
-                ticketCamera.setOnClickListener {
-                    photoName = "IMG_${Date()}.JPG"
-                    val photoFile = File(requireContext().applicationContext.filesDir, photoName)
-                    val photoUri = FileProvider.getUriForFile(
-                        requireContext(),
-                        "com.iub.lab7.fileprovider",
-                        photoFile
-                    )
-                    takePhoto.launch(photoUri)
-                }
-
-                val captureImageIntent = takePhoto.contract.createIntent(
-                    requireContext(),
-                    Uri.parse("")
-                )
-
-                ticketCamera.isEnabled = canResolveIntent(captureImageIntent)
-
-
             }
 
+            ticketSolved.setOnCheckedChangeListener { _, isChecked ->
+                ticketDetailViewModel.updateTicket { oldTicket ->
+                    oldTicket.copy(isSolved = isChecked)
+                }
+            }
+
+            ticketAssignee.setOnClickListener {
+                selectAssignee.launch(null)
+            }
+
+            val selectAssigneeIntent = selectAssignee.contract.createIntent(
+                requireContext(),
+                input = null
+            )
+            ticketAssignee.isEnabled = canResolveIntent(selectAssigneeIntent)
+
+            ticketCamera.setOnClickListener {
+                photoName = "IMG_${Date()}.JPG"
+                val photoFile = File(requireContext().applicationContext.filesDir, photoName)
+                val photoUri = FileProvider.getUriForFile(
+                    requireContext(),
+                    "com.iub.lab7.fileprovider",
+                    photoFile
+                )
+                takePhoto.launch(photoUri)
+            }
+
+            val captureImageIntent = takePhoto.contract.createIntent(
+                requireContext(),
+                Uri.parse("")
+            )
+            ticketCamera.isEnabled = canResolveIntent(captureImageIntent)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                ticketDetailViewModel.ticket.collect {
-                        ticket -> ticket?.let { updateUi(it) }
+                ticketDetailViewModel.ticket.collect { ticket ->
+                    ticket?.let { updateUi(it) }
                 }
             }
         }
@@ -138,7 +130,6 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
                 oldTicket.copy(date = newDate.time)
             }
         }
-
     }
 
     override fun onDestroyView() {
@@ -147,7 +138,8 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
     }
 
     private fun updateUi(ticket: Ticket) {
-        val dateFormat = SimpleDateFormat("EEEE, dd MMM yyyy, HH:mm", Locale.getDefault()) // Example: 26 Feb 2025, 14:30
+        val dateFormat =
+            SimpleDateFormat("EEEE, dd MMM yyyy, HH:mm", Locale.getDefault()) // Example: 26 Feb 2025, 14:30
 
         binding.apply {
             if (ticketTitle.text.toString() != ticket.title) {
@@ -156,9 +148,8 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
 
             ticketDate.text = dateFormat.format(Date(ticket.date))
 
-            ticketDate.setOnClickListener{
+            ticketDate.setOnClickListener {
                 val currentDate = Date(ticket.date)
-
                 findNavController().navigate((TicketDetailFragmentDirections.selectDate(currentDate)))
             }
 
@@ -187,6 +178,22 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             }
 
             updatePhoto(ticket.photoFileName)
+
+            // ... inside updateUi(ticket: Ticket)
+            binding.ticketPhoto.setOnClickListener {
+                val photoFile = File(requireContext().applicationContext.filesDir, ticket.photoFileName ?: "")
+                if (photoFile.exists()) {
+                    // Option 1: Directly show the dialog with newInstance(...)
+                    val zoomDialog = ZoomedImageDialogFragment.newInstance(photoFile.absolutePath)
+                    zoomDialog.show(parentFragmentManager, "ZoomedImageDialog")
+
+                    // Option 2: Use Navigation Component (if you created an action)
+                    // val action = TicketDetailFragmentDirections.actionTicketDetailFragmentToZoomedImageDialogFragment()
+                    // findNavController().navigate(action)
+                } else {
+                    Log.e("ZoomedImage", "Photo file does not exist: ${photoFile.absolutePath}")
+                }
+            }
         }
     }
 
@@ -263,5 +270,4 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             }
         }
     }
-
 }

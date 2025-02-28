@@ -26,6 +26,9 @@
         <action
             android:id="@+id/select_date"
             app:destination="@id/datePickerFragment" />
+        <action
+            android:id="@+id/action_ticketDetailFragment_to_zoomedImageDialogFragment"
+            app:destination="@id/zoomedImageDialogFragment" />
     </fragment>
     <dialog
         android:id="@+id/datePickerFragment"
@@ -35,5 +38,9 @@
             android:name="ticketDate"
             app:argType="java.util.Date" />
     </dialog>
+    <dialog
+        android:id="@+id/zoomedImageDialogFragment"
+        android:name="com.example.lab7.ZoomedImageDialogFragment"
+        android:label="ZoomedImageDialogFragment"/>
 
 </navigation>
