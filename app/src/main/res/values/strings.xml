@@ -17,4 +17,5 @@
     <string name="ticket_report_assignee">The assignee is %s.</string>
     <string name="ticket_report_subject">Ticket Report</string>
     <string name="send_report">Send ticket report via</string>
+    <string name="ticket_call_text">Call Assignee</string>
 </resources>
