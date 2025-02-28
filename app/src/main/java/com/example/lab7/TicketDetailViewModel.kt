@@ -40,6 +40,12 @@ class TicketDetailViewModel(ticketId: UUID?) : ViewModel() {
         }
     }
 
+    fun deleteTicket() {
+        _ticket.value?.let { ticket ->
+            ticketRepository.deleteTicket(ticket)
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         _ticket.value?.let{
@@ -49,9 +55,6 @@ class TicketDetailViewModel(ticketId: UUID?) : ViewModel() {
                 ticketRepository.addTicket(it)
             }
         }
-//        viewModelScope.launch {
-//            _ticket.value?.let { ticketRepository.updateTicket(it) }
-//        }
     }
 
 }

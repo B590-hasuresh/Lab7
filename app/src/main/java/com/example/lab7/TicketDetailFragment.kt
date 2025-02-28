@@ -1,25 +1,28 @@
 package com.example.lab7
 
-import androidx.fragment.app.Fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.example.lab7.databinding.FragmentTicketDetailBinding
-import java.util.Date
-import java.util.UUID
 import androidx.navigation.fragment.navArgs
+import com.example.lab7.databinding.FragmentTicketDetailBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
+import java.util.UUID
+
+private const val TAG = "TicketDetailFragment"
 
 class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
     private val args: TicketDetailFragmentArgs by navArgs()
@@ -32,19 +35,29 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             "Cannot access the view because it is null."
         }
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentTicketDetailBinding.inflate(inflater, container,  false)
+        _binding = FragmentTicketDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.toolbar.inflateMenu(R.menu.fragment_ticket_detail)
+
+        binding.toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.delete_ticket -> {
+                    ticketDetailViewModel.deleteTicket()
+                    findNavController().navigateUp() // Navigate back after deletion
+                    true
+                }
+                else -> false
+            }
+        }
 
         binding.apply {
             binding.apply {
@@ -53,6 +66,7 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
                         oldTicket.copy(title = text.toString())
                     }
                 }
+
                 ticketSolved.setOnCheckedChangeListener { _, isChecked ->
                     ticketDetailViewModel.updateTicket { oldTicket ->
                         oldTicket.copy(isSolved = isChecked)
@@ -61,13 +75,15 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             }
 
         }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                ticketDetailViewModel.ticket.collect { ticket ->
-                    ticket?.let { updateUi(it) }
+                ticketDetailViewModel.ticket.collect {
+                        ticket -> ticket?.let { updateUi(it) }
                 }
             }
         }
+
         setFragmentResultListener(
             DatePickerFragment.REQUEST_KEY_DATE
         ) { _, bundle ->
@@ -77,16 +93,16 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             }
         }
 
-
-
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     private fun updateUi(ticket: Ticket) {
-        val dateFormat = SimpleDateFormat("EEEE, dd MMM yyyy, HH:mm", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("EEEE, dd MMM yyyy, HH:mm", Locale.getDefault()) // Example: 26 Feb 2025, 14:30
+
         binding.apply {
             if (ticketTitle.text.toString() != ticket.title) {
                 ticketTitle.setText(ticket.title)

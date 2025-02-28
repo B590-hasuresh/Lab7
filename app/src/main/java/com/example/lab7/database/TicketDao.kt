@@ -1,12 +1,13 @@
 package com.example.lab7.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.lab7.Ticket
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
-import androidx.room.Update
 
 @Dao
 interface TicketDao {
@@ -22,4 +23,8 @@ interface TicketDao {
 
     @Insert
     fun addTicket(ticket: Ticket)
+
+    @Delete
+    fun deleteTicket(ticket: Ticket)
+
 }
