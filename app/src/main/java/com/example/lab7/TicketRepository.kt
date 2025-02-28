@@ -21,6 +21,7 @@ class TicketRepository private constructor(
         DATABASE_NAME
     )
         .addMigrations(migration_1_2, migration_2_3)
+        .fallbackToDestructiveMigration()
         .build()
 
     fun getTickets(): Flow<List<Ticket>> = database.ticketDao().getTickets()

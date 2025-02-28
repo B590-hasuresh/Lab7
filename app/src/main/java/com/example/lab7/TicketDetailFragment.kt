@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
+import androidx.core.view.doOnLayout
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
@@ -34,7 +35,7 @@ import java.util.UUID
 private const val TAG = "TicketDetailFragment"
 private const val DATE_FORMAT = "EEE, MMM, dd"
 class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
-    private val photoName: String? =null
+    private var photoName: String? = null
     private val args: TicketDetailFragmentArgs by navArgs()
     private val ticketDetailViewModel: TicketDetailViewModel by viewModels {
         TicketDetailViewModelFactory(args.ticketId)
@@ -99,7 +100,7 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
                 ticketAssignee.isEnabled = canResolveIntent(selectAssigneeIntent)
 
                 ticketCamera.setOnClickListener {
-                    val photoName = "IMG_${Date()}.JPG"
+                    photoName = "IMG_${Date()}.JPG"
                     val photoFile = File(requireContext().applicationContext.filesDir, photoName)
                     val photoUri = FileProvider.getUriForFile(
                         requireContext(),
@@ -154,11 +155,13 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             }
 
             ticketDate.text = dateFormat.format(Date(ticket.date))
+
             ticketDate.setOnClickListener{
                 val currentDate = Date(ticket.date)
 
                 findNavController().navigate((TicketDetailFragmentDirections.selectDate(currentDate)))
             }
+
             ticketSolved.isChecked = ticket.isSolved
 
             ticketReport.setOnClickListener {
@@ -182,6 +185,8 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             ticketAssignee.text = ticket.assignee.ifEmpty {
                 getString(R.string.ticket_assignee_text)
             }
+
+            updatePhoto(ticket.photoFileName)
         }
     }
 
@@ -234,6 +239,29 @@ class TicketDetailFragment : Fragment(R.layout.fragment_ticket_detail) {
             )
 
         return resolvedActivity != null
+    }
+
+    private fun updatePhoto(photoFileName: String?) {
+        if (binding.ticketPhoto.tag != photoFileName) {
+            val photoFile = photoFileName?.let {
+                File(requireContext().applicationContext.filesDir, it)
+            }
+
+            if (photoFile?.exists() == true) {
+                binding.ticketPhoto.doOnLayout { measuredView ->
+                    val scaledBitmap = getScaledBitmap(
+                        photoFile.path,
+                        measuredView.width,
+                        measuredView.height
+                    )
+                    binding.ticketPhoto.setImageBitmap(scaledBitmap)
+                    binding.ticketPhoto.tag = photoFileName
+                }
+            } else {
+                binding.ticketPhoto.setImageBitmap(null)
+                binding.ticketPhoto.tag = null
+            }
+        }
     }
 
 }
