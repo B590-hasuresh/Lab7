@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lab7.databinding.FragmentTicketListBinding
 import kotlinx.coroutines.launch
 
-
 private const val TAG = "TicketListFragment"
 
 class TicketListFragment : Fragment() {
@@ -28,16 +27,11 @@ class TicketListFragment : Fragment() {
 
     private val ticketListViewModel: TicketListViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG, "Total tickets: ${ticketListViewModel.tickets}")
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentTicketListBinding.inflate(inflater, container, false)
         binding.ticketRecyclerView.layoutManager = LinearLayoutManager(context)
         return binding.root
@@ -48,15 +42,13 @@ class TicketListFragment : Fragment() {
         binding.toolbar.inflateMenu(R.menu.fragment_ticket_list)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(
-                Lifecycle.State.STARTED
-            ) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 ticketListViewModel.tickets.collect { tickets ->
-                    binding.ticketRecyclerView.adapter = TicketListAdapter(tickets) {
-                            ticketId ->
-                        findNavController().navigate(TicketListFragmentDirections.showTicketDetail(ticketId))
+                    if (tickets.isEmpty()) {
+                        showEmptyView()
+                    } else {
+                        showRecyclerView(tickets)
                     }
-
                 }
             }
         }
@@ -71,6 +63,22 @@ class TicketListFragment : Fragment() {
             }
         }
 
+        binding.addTicketButton.setOnClickListener {
+            findNavController().navigate(TicketListFragmentDirections.showTicketDetail(null))
+        }
+    }
+
+    private fun showEmptyView() {
+        binding.ticketRecyclerView.visibility = View.GONE
+        binding.emptyView.visibility = View.VISIBLE
+    }
+
+    private fun showRecyclerView(tickets: List<Ticket>) {
+        binding.ticketRecyclerView.visibility = View.VISIBLE
+        binding.emptyView.visibility = View.GONE
+        binding.ticketRecyclerView.adapter = TicketListAdapter(tickets) { ticketId ->
+            findNavController().navigate(TicketListFragmentDirections.showTicketDetail(ticketId))
+        }
     }
 
     override fun onDestroyView() {
