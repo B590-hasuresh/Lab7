@@ -3,14 +3,14 @@ package com.example.lab7
 import android.content.Context
 import androidx.room.Room
 import com.example.lab7.database.TicketDatabase
-import kotlinx.coroutines.flow.Flow
-import java.util.UUID
+import com.example.lab7.database.migration_1_2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 private const val DATABASE_NAME="ticket-database"
-
 class TicketRepository private constructor(
     context: Context,
     private val coroutineScope: CoroutineScope = GlobalScope) {
@@ -19,6 +19,7 @@ class TicketRepository private constructor(
         TicketDatabase::class.java,
         DATABASE_NAME
     )
+        .addMigrations(migration_1_2)
         .build()
 
     fun getTickets(): Flow<List<Ticket>> = database.ticketDao().getTickets()
