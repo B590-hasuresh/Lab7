@@ -14,5 +14,6 @@ data class Ticket(
     val title: String,
     val date: Long,
     val isSolved: Boolean,
-    val assignee: String = ""
+    val assignee: String = "",
+    val photoFileName: String? = null
 )
